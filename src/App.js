@@ -55,6 +55,7 @@ const img = {
 
 function App() {
     const [files, setFiles] = useState([]);
+    const reader = new FileReader();
 
     const {
         getRootProps,
@@ -66,9 +67,10 @@ function App() {
         accept: 'image/*', 
         maxFiles: 1,
         onDrop: acceptedFiles => {
-            setFiles(acceptedFiles.map(file => Object.assign(file, {
-              preview: URL.createObjectURL(file)
-            })));
+            let arr = acceptedFiles.map(file => Object.assign(file, {
+                preview: URL.createObjectURL(file)
+            }));
+            setFiles(arr);
         }
     });
 
@@ -94,8 +96,38 @@ function App() {
         </div>
     ));
 
-    useEffect(() => () => {
-        files.forEach(file => URL.revokeObjectURL(file.preview));
+    let getBase64 = (file, cb) => {
+        let reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function () {
+            cb(reader.result)
+        };
+        reader.onerror = function (error) {
+            console.log('Error: ', error);
+        };
+    }
+
+    useEffect(() => {
+        console.log('In use effect: ', files);
+        // files.forEach(file => URL.revokeObjectURL(file.preview));
+
+        let encodedImage = '';
+        if (files.length){
+            getBase64(files[0], (result) => {
+                encodedImage = result;
+                fetch("http://127.0.0.1:3001/", {
+                    method: 'POST',
+                    mode: 'cors',
+                    body: encodedImage,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                    .then(res => res.json())
+                    .then(res => console.log(res));
+            });
+        }
+        
     }, [files]);
 
     return (
