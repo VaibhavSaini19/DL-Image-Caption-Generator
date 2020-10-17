@@ -55,7 +55,7 @@ const img = {
 
 function App() {
     const [files, setFiles] = useState([]);
-    const reader = new FileReader();
+    // const reader = new FileReader();
 
     const {
         getRootProps,
@@ -89,6 +89,7 @@ function App() {
         <div style={thumb} key={file.name}>
             <div style={thumbInner}>
                 <img
+                alt=""
                 src={file.preview}
                 style={img}
                 />
