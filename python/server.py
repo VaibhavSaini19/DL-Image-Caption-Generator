@@ -89,7 +89,8 @@ def hello():
     print(desc)
     # plt.imshow(image)
     # image.save('my.png')
-    return json.dumps("Hello World!")
+    # return json.dumps("Hello World!")
+    return json.dumps(desc)
 
 if __name__ == '__main__':
     app.run(port=3001)

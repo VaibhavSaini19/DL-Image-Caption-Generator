@@ -55,7 +55,8 @@ const img = {
 
 function App() {
     const [files, setFiles] = useState([]);
-    // const reader = new FileReader();
+    const [caption, setCaption] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const {
         getRootProps,
@@ -116,6 +117,7 @@ function App() {
         if (files.length){
             getBase64(files[0], (result) => {
                 encodedImage = result;
+                setLoading(true);
                 fetch("http://127.0.0.1:3001/", {
                     method: 'POST',
                     mode: 'cors',
@@ -125,7 +127,11 @@ function App() {
                     }
                 })
                     .then(res => res.json())
-                    .then(res => console.log(res));
+                    .then(res => {
+                        setLoading(false);
+                        setCaption(res);
+                        console.log(res)
+                    });
             });
         }
         
@@ -133,15 +139,37 @@ function App() {
 
     return (
         <div className="dropzone">
+            {loading && (
+                <div className="loading">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            )}
             <div {...getRootProps({style})}>
                 <input {...getInputProps()} />
                 <div className="hint-container">
                     <div className="heading">Image Caption Generator</div>
                     <p>Caption an image using the power of Deep Learning</p>
-                    <br/>
-                    <div className="select-btn">Choose Image</div>
-                    <p className="text-sm">or Drag 'n' drop an image here</p>
-                    
+                    <div>
+                        {!caption && (
+                            <div>
+                                <div className="select-btn">Choose Image</div>
+                                <p className="text-sm">or Drag 'n' drop an image here</p>
+                            </div>
+                        )}
+                    </div>
+                    <div>
+                        {caption && (
+                            <h4>Generated Caption</h4>
+                        )}
+                        {caption}
+                    </div>
                     <div style={thumbsContainer}>
                         {thumbs}
                     </div>
